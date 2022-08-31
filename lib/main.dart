@@ -1,3 +1,4 @@
+import 'package:clean_architecture_with_flutter/src/features/movies/domain/entities/movie.dart';
 import 'package:flutter/material.dart';
 
 void main() {
