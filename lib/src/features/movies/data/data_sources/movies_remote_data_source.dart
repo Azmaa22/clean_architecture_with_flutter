@@ -18,7 +18,6 @@ class MoviesRemoteDataSource extends BaseMoviesRemoteDataSource {
         '${EndPoints.getNowPlayingMovies}?api_key=${AppConstances.apiKey}';
     final response = await Dio().get(path);
     if (response.statusCode == 200) {
-      print('data ${response.data}');
       return List<MovieModel>.from(
         (response.data['results'] as List).map(
           (movieData) => MovieModel.fromJson(movieData),
