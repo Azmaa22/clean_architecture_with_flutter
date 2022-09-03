@@ -4,13 +4,13 @@ import 'package:clean_architecture_with_flutter/src/features/movies/domain/entit
 import 'package:clean_architecture_with_flutter/src/features/movies/domain/repositories/base_movies_repository.dart';
 import 'package:dartz/dartz.dart';
 
-class GetPopularMoviesUseCase extends BaseUseCase<List<Movie>> {
+class GetPopularMoviesUseCase extends BaseUseCase<List<Movie>, NoParameters> {
   final BaseMoviesRepository baseMoviesRepository;
 
   GetPopularMoviesUseCase(this.baseMoviesRepository);
 
   @override
-  Future<Either<Failure, List<Movie>>> call() async {
+  Future<Either<Failure, List<Movie>>> call(NoParameters parameters) async {
     return await baseMoviesRepository.getPopularMovies();
   }
 }

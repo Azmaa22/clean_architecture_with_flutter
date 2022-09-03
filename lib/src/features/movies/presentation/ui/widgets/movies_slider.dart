@@ -3,15 +3,15 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:clean_architecture_with_flutter/src/core/api/end_points.dart';
 import 'package:clean_architecture_with_flutter/src/features/movies/domain/entities/movie.dart';
+import 'package:clean_architecture_with_flutter/src/features/movies/presentation/ui/screens/movie_detail_screen.dart';
 import 'package:flutter/material.dart';
 
 class MoviesSlider extends StatelessWidget {
   final List<Movie> moviesList;
-  final VoidCallback goToMovieDetails;
+
   const MoviesSlider({
     Key? key,
     required this.moviesList,
-    required this.goToMovieDetails,
   }) : super(key: key);
 
   @override
@@ -28,7 +28,16 @@ class MoviesSlider extends StatelessWidget {
           (item) {
             return GestureDetector(
               key: const Key('openMovieMinimalDetail'),
-              onTap: goToMovieDetails,
+              onTap: () {
+                Navigator.push<void>(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (BuildContext context) => MovieDetailScreen(
+                      id: item.id,
+                    ),
+                  ),
+                );
+              },
               child: Stack(
                 children: [
                   ShaderMask(

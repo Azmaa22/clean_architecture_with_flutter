@@ -2,16 +2,16 @@ import 'package:animate_do/animate_do.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:clean_architecture_with_flutter/src/core/api/end_points.dart';
 import 'package:clean_architecture_with_flutter/src/features/movies/domain/entities/movie.dart';
+import 'package:clean_architecture_with_flutter/src/features/movies/presentation/ui/screens/movie_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
 class MoviesList extends StatelessWidget {
   final List<Movie> moviesList;
-  final VoidCallback goToMovieDetails;
+
   const MoviesList({
     Key? key,
     required this.moviesList,
-    required this.goToMovieDetails,
   }) : super(key: key);
 
   @override
@@ -30,7 +30,16 @@ class MoviesList extends StatelessWidget {
             return Container(
               padding: const EdgeInsets.only(right: 8.0),
               child: InkWell(
-                onTap: goToMovieDetails,
+                onTap: () {
+                  Navigator.push<void>(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (BuildContext context) => MovieDetailScreen(
+                        id: movie.id,
+                      ),
+                    ),
+                  );
+                },
                 child: ClipRRect(
                   borderRadius: const BorderRadius.all(Radius.circular(8.0)),
                   child: CachedNetworkImage(

@@ -6,6 +6,7 @@ import 'package:clean_architecture_with_flutter/src/core/utils/shared/widgets/lo
 import 'package:clean_architecture_with_flutter/src/features/movies/presentation/bloc/movies_bloc.dart';
 import 'package:clean_architecture_with_flutter/src/features/movies/presentation/bloc/movies_events.dart';
 import 'package:clean_architecture_with_flutter/src/features/movies/presentation/bloc/movies_states.dart';
+import 'package:clean_architecture_with_flutter/src/features/movies/presentation/ui/screens/movie_detail_screen.dart';
 import 'package:clean_architecture_with_flutter/src/features/movies/presentation/ui/widgets/list_header.dart';
 import 'package:clean_architecture_with_flutter/src/features/movies/presentation/ui/widgets/movies_list.dart';
 import 'package:clean_architecture_with_flutter/src/features/movies/presentation/ui/widgets/movies_slider.dart';
@@ -29,7 +30,6 @@ class MainMoviesScreen extends StatelessWidget {
           GetTopRatedMoviesEvent(),
         ),
       child: Scaffold(
-        backgroundColor: Colors.grey.shade900,
         body: SingleChildScrollView(
           key: const Key('movieScrollView'),
           child: Column(
@@ -47,9 +47,6 @@ class MainMoviesScreen extends StatelessWidget {
                     case RequestState.isLoaded:
                       return MoviesSlider(
                         moviesList: state.nowPlayingMovies,
-                        goToMovieDetails: () {
-                          print('go to details');
-                        },
                       );
 
                     case RequestState.isError:
@@ -75,9 +72,6 @@ class MainMoviesScreen extends StatelessWidget {
                     case RequestState.isLoaded:
                       return MoviesList(
                         moviesList: state.popularMovies,
-                        goToMovieDetails: () {
-                          print('go to details');
-                        },
                       );
                     case RequestState.isError:
                       return ErrorCard(
@@ -102,9 +96,6 @@ class MainMoviesScreen extends StatelessWidget {
                     case RequestState.isLoaded:
                       return MoviesList(
                         moviesList: state.topRatedMovies,
-                        goToMovieDetails: () {
-                          print('go to details');
-                        },
                       );
                     case RequestState.isError:
                       return ErrorCard(
