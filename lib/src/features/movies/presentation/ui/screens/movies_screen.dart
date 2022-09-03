@@ -1,274 +1,121 @@
-import 'package:animate_do/animate_do.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:clean_architecture_with_flutter/src/core/api/end_points.dart';
 import 'package:clean_architecture_with_flutter/src/core/utils/dummy.dart';
+import 'package:clean_architecture_with_flutter/src/core/utils/services/service_locator.dart';
+import 'package:clean_architecture_with_flutter/src/core/utils/shared/enums/request_state_enum.dart';
+import 'package:clean_architecture_with_flutter/src/core/utils/shared/widgets/error_card.dart';
+import 'package:clean_architecture_with_flutter/src/core/utils/shared/widgets/loader.dart';
+import 'package:clean_architecture_with_flutter/src/features/movies/presentation/bloc/movies_bloc.dart';
+import 'package:clean_architecture_with_flutter/src/features/movies/presentation/bloc/movies_events.dart';
+import 'package:clean_architecture_with_flutter/src/features/movies/presentation/bloc/movies_states.dart';
+import 'package:clean_architecture_with_flutter/src/features/movies/presentation/ui/widgets/list_header.dart';
+import 'package:clean_architecture_with_flutter/src/features/movies/presentation/ui/widgets/movies_list.dart';
+import 'package:clean_architecture_with_flutter/src/features/movies/presentation/ui/widgets/movies_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:shimmer/shimmer.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class MainMoviesScreen extends StatelessWidget {
   const MainMoviesScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        key: const Key('movieScrollView'),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            FadeIn(
-              duration: const Duration(milliseconds: 500),
-              child: CarouselSlider(
-                options: CarouselOptions(
-                  height: 400.0,
-                  viewportFraction: 1.0,
-                  onPageChanged: (index, reason) {},
-                ),
-                items: moviesList.map(
-                  (item) {
-                    return GestureDetector(
-                      key: const Key('openMovieMinimalDetail'),
-                      onTap: () {
-                        /// TODO : NAVIGATE TO MOVIE DETAILS
-                      },
-                      child: Stack(
-                        children: [
-                          ShaderMask(
-                            shaderCallback: (rect) {
-                              return const LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  // fromLTRB
-                                  Colors.transparent,
-                                  Colors.black,
-                                  Colors.black,
-                                  Colors.transparent,
-                                ],
-                                stops: [0, 0.3, 0.5, 1],
-                              ).createShader(
-                                Rect.fromLTRB(0, 0, rect.width, rect.height),
-                              );
-                            },
-                            blendMode: BlendMode.dstIn,
-                            child: CachedNetworkImage(
-                              height: 560.0,
-                              imageUrl: EndPoints.imageUrl(item.backdropPath),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          Align(
-                            alignment: Alignment.bottomCenter,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 16.0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Icon(
-                                        Icons.circle,
-                                        color: Colors.redAccent,
-                                        size: 16.0,
-                                      ),
-                                      const SizedBox(width: 4.0),
-                                      Text(
-                                        'Now Playing'.toUpperCase(),
-                                        style: const TextStyle(
-                                          fontSize: 16.0,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 16.0),
-                                  child: Text(
-                                    item.title,
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                      fontSize: 24,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ).toList(),
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.fromLTRB(16.0, 24.0, 16.0, 8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Popular",
-                    style: GoogleFonts.poppins(
-                      fontSize: 19,
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: 0.15,
-                    ),
-                  ),
-                  InkWell(
-                    onTap: () {
-                      /// TODO : NAVIGATION TO POPULAR SCREEN
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        children: const [
-                          Text('See More'),
-                          Icon(
-                            Icons.arrow_forward_ios,
-                            size: 16.0,
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            FadeIn(
-              duration: const Duration(milliseconds: 500),
-              child: SizedBox(
-                height: 170.0,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  itemCount: moviesList.length,
-                  itemBuilder: (context, index) {
-                    final movie = moviesList[index];
-                    return Container(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: InkWell(
-                        onTap: () {
-                          /// TODO : NAVIGATE TO  MOVIE DETAILS
+    return BlocProvider(
+      create: (context) => serviceLocator<MoviesBloc>()
+        ..add(
+          GetNowPlayingMoviesEvent(),
+        )
+        ..add(
+          GetPopularMoviesEvent(),
+        )
+        ..add(
+          GetTopRatedMoviesEvent(),
+        ),
+      child: Scaffold(
+        backgroundColor: Colors.grey.shade900,
+        body: SingleChildScrollView(
+          key: const Key('movieScrollView'),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              BlocBuilder<MoviesBloc, MoviesStates>(
+                buildWhen: (previous, current) =>
+                    previous.nowPlayingMoviesState !=
+                    current.nowPlayingMoviesState,
+                builder: (context, state) {
+                  switch (state.nowPlayingMoviesState) {
+                    case RequestState.isLoading:
+                      return const Loader();
+
+                    case RequestState.isLoaded:
+                      return MoviesSlider(
+                        moviesList: state.nowPlayingMovies,
+                        goToMovieDetails: () {
+                          print('go to details');
                         },
-                        child: ClipRRect(
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(8.0)),
-                          child: CachedNetworkImage(
-                            width: 120.0,
-                            fit: BoxFit.cover,
-                            imageUrl: EndPoints.imageUrl(movie.backdropPath),
-                            placeholder: (context, url) => Shimmer.fromColors(
-                              baseColor: Colors.grey[850]!,
-                              highlightColor: Colors.grey[800]!,
-                              child: Container(
-                                height: 170.0,
-                                width: 120.0,
-                                decoration: BoxDecoration(
-                                  color: Colors.black,
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                              ),
-                            ),
-                            errorWidget: (context, url, error) =>
-                                const Icon(Icons.error),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
+                      );
+
+                    case RequestState.isError:
+                      return ErrorCard(
+                        errorMsg: state.nowPlayingErrorMessage,
+                      );
+                  }
+                },
               ),
-            ),
-            Container(
-              margin: const EdgeInsets.fromLTRB(
-                16.0,
-                24.0,
-                16.0,
-                8.0,
+              ListHeader(
+                title: 'Popular',
+                onPress: () {
+                  print('see more');
+                },
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Top Rated",
-                    style: GoogleFonts.poppins(
-                      fontSize: 19,
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: 0.15,
-                    ),
-                  ),
-                  InkWell(
-                    onTap: () {
-                      /// TODO : NAVIGATION TO Top Rated Movies Screen
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        children: const [
-                          Text('See More'),
-                          Icon(
-                            Icons.arrow_forward_ios,
-                            size: 16.0,
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            FadeIn(
-              duration: const Duration(milliseconds: 500),
-              child: SizedBox(
-                height: 170.0,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  itemCount: moviesList.length,
-                  itemBuilder: (context, index) {
-                    final movie = moviesList[index];
-                    return Container(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: InkWell(
-                        onTap: () {
-                          /// TODO : NAVIGATE TO  MOVIE DETAILS
+              BlocBuilder<MoviesBloc, MoviesStates>(
+                buildWhen: (previous, current) =>
+                    previous.popularMoviesState != current.popularMoviesState,
+                builder: (context, state) {
+                  switch (state.popularMoviesState) {
+                    case RequestState.isLoading:
+                      return const Loader();
+                    case RequestState.isLoaded:
+                      return MoviesList(
+                        moviesList: state.popularMovies,
+                        goToMovieDetails: () {
+                          print('go to details');
                         },
-                        child: ClipRRect(
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(8.0)),
-                          child: CachedNetworkImage(
-                            width: 120.0,
-                            fit: BoxFit.cover,
-                            imageUrl: EndPoints.imageUrl(movie.backdropPath),
-                            placeholder: (context, url) => Shimmer.fromColors(
-                              baseColor: Colors.grey[850]!,
-                              highlightColor: Colors.grey[800]!,
-                              child: Container(
-                                height: 170.0,
-                                width: 120.0,
-                                decoration: BoxDecoration(
-                                  color: Colors.black,
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                              ),
-                            ),
-                            errorWidget: (context, url, error) =>
-                                const Icon(Icons.error),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
+                      );
+                    case RequestState.isError:
+                      return ErrorCard(
+                        errorMsg: state.popularErrorMessage,
+                      );
+                  }
+                },
               ),
-            ),
-            const SizedBox(height: 50.0),
-          ],
+              ListHeader(
+                title: 'Top Rated',
+                onPress: () {
+                  print('see more');
+                },
+              ),
+              BlocBuilder<MoviesBloc, MoviesStates>(
+                buildWhen: (previous, current) =>
+                    previous.topRatedMoviesState != current.topRatedMoviesState,
+                builder: (context, state) {
+                  switch (state.topRatedMoviesState) {
+                    case RequestState.isLoading:
+                      return const Loader();
+                    case RequestState.isLoaded:
+                      return MoviesList(
+                        moviesList: state.topRatedMovies,
+                        goToMovieDetails: () {
+                          print('go to details');
+                        },
+                      );
+                    case RequestState.isError:
+                      return ErrorCard(
+                        errorMsg: state.topRatedErrorMessage,
+                      );
+                  }
+                },
+              ),
+              const SizedBox(height: 50.0),
+            ],
+          ),
         ),
       ),
     );
